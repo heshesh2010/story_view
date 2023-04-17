@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -118,7 +117,16 @@ class StoryItem {
     return StoryItem(
       Container(
         key: key,
-        color: Colors.black,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xff123945),
+              Color(0xff997F5E),
+            ],
+          ),
+        ),
         child: Stack(
           children: <Widget>[
             StoryImage.url(
@@ -230,7 +238,16 @@ class StoryItem {
     return StoryItem(
         Container(
           key: key,
-          color: Colors.black,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xff123945),
+                Color(0xff997F5E),
+              ],
+            ),
+          ),
           child: Stack(
             children: <Widget>[
               StoryVideo.url(
