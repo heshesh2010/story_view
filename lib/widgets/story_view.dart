@@ -405,6 +405,8 @@ class StoryView extends StatefulWidget {
   /// provide this callback so as to enable scroll events on the list view.
   final Function(Direction?)? onVerticalSwipeComplete;
 
+  final Function(Direction?)? onHorizontalSwipeComplete;
+
   /// Callback for when a story is currently being shown.
   final ValueChanged<StoryItem>? onStoryShow;
 
@@ -434,6 +436,7 @@ class StoryView extends StatefulWidget {
     this.repeat = false,
     this.inline = false,
     this.onVerticalSwipeComplete,
+    this.onHorizontalSwipeComplete,
     this.indicatorColor = Colors.white,
   });
 
@@ -451,6 +454,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
   StreamSubscription<PlaybackState>? _playbackSubscription;
 
   VerticalDragInfo? verticalDragInfo;
+  HorizontalDragInfo? horizontalDragInfo;
 
   StoryItem? get _currentStory {
     return widget.storyItems.firstWhereOrNull((it) => !it!.shown);
@@ -672,6 +676,40 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
               alignment: Alignment.centerRight,
               heightFactor: 1,
               child: GestureDetector(
+                onHorizontalDragStart: widget.onHorizontalSwipeComplete == null
+                    ? null
+                    : (details) {
+                        widget.controller.pause();
+                      },
+                onHorizontalDragCancel: widget.onHorizontalSwipeComplete == null
+                    ? null
+                    : () {
+                        widget.controller.play();
+                      },
+                onHorizontalDragUpdate: widget.onHorizontalSwipeComplete == null
+                    ? null
+                    : (details) {
+                        if (horizontalDragInfo == null) {
+                          horizontalDragInfo = HorizontalDragInfo();
+                        }
+
+                        horizontalDragInfo!.update(details.primaryDelta!);
+
+                        // TODO: provide callback interface for animation purposes
+                      },
+                onHorizontalDragEnd: widget.onHorizontalSwipeComplete == null
+                    ? null
+                    : (details) {
+                        widget.controller.pause();
+                        // finish up drag cycle
+                        if (!horizontalDragInfo!.cancel &&
+                            widget.onHorizontalSwipeComplete != null) {
+                          widget.onHorizontalSwipeComplete!(
+                              horizontalDragInfo!.direction);
+                        }
+
+                        horizontalDragInfo = null;
+                      },
                 onTapDown: (details) {
                   widget.controller.pause();
                 },
