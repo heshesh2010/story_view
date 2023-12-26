@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
 import '../utils.dart';
 import '../controller/story_controller.dart';
@@ -16,8 +17,8 @@ class VideoLoader {
   Map<String, dynamic>? requestHeaders;
 
   LoadState state = LoadState.loading;
-
-  VideoLoader(this.url, {this.requestHeaders});
+  bool isVideoMuted;
+  VideoLoader(this.url, this.isVideoMuted, {this.requestHeaders});
 
   void loadVideo(VoidCallback onComplete) {
     if (this.videoFile != null) {
@@ -47,12 +48,12 @@ class StoryVideo extends StatefulWidget {
   StoryVideo(this.videoLoader, {this.storyController, Key? key})
       : super(key: key ?? UniqueKey());
 
-  static StoryVideo url(String url,
+  static StoryVideo url(String url, bool isVideoMuted,
       {StoryController? controller,
       Map<String, dynamic>? requestHeaders,
       Key? key}) {
     return StoryVideo(
-      VideoLoader(url, requestHeaders: requestHeaders),
+      VideoLoader(url, isVideoMuted, requestHeaders: requestHeaders),
       storyController: controller,
       key: key,
     );
@@ -85,8 +86,24 @@ class StoryVideoState extends State<StoryVideo> {
         playerController!.initialize().then((v) {
           setState(() {});
           widget.storyController!.play();
-        });
 
+          if (widget.videoLoader.isVideoMuted)
+            playerController!.setVolume(0);
+          else
+            playerController!.setVolume(1);
+        });
+        FlutterVolumeController.addListener(
+          (volume) async {
+            debugPrint('Hesham Volume changed: $volume');
+
+            if (volume == 0.0) {
+              playerController!.setVolume(volume);
+            } else if (volume > 0.0) {
+              playerController!.setVolume(volume);
+            }
+          },
+          emitOnStart: false,
+        );
         if (widget.storyController != null) {
           _streamSubscription =
               widget.storyController!.playbackNotifier.listen((playbackState) {

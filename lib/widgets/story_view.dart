@@ -234,6 +234,7 @@ class StoryItem {
     String? caption,
     bool shown = false,
     Map<String, dynamic>? requestHeaders,
+    required bool isVideoMuted,
   }) {
     return StoryItem(
         Container(
@@ -252,6 +253,7 @@ class StoryItem {
             children: <Widget>[
               StoryVideo.url(
                 url,
+                isVideoMuted,
                 controller: controller,
                 requestHeaders: requestHeaders,
               ),
