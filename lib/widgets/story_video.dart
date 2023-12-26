@@ -83,19 +83,38 @@ class StoryVideoState extends State<StoryVideo> {
         this.playerController =
             VideoPlayerController.file(widget.videoLoader.videoFile!);
 
-        if (widget.videoLoader.isVideoMuted)
+        if (widget.videoLoader.isVideoMuted) {
           playerController!.setVolume(0);
-        else
+
+          FlutterVolumeController.setIOSAudioSessionCategory(
+            category: AudioSessionCategory.ambient,
+          );
+          setState(() {});
+        } else {
           playerController!.setVolume(1);
+
+          FlutterVolumeController.setIOSAudioSessionCategory(
+            category: AudioSessionCategory.playback,
+          );
+          setState(() {});
+        }
 
         FlutterVolumeController.addListener(
           (volume) async {
             debugPrint('Hesham Volume changed: $volume');
 
             if (volume == 0.0) {
+              FlutterVolumeController.setIOSAudioSessionCategory(
+                category: AudioSessionCategory.ambient,
+              );
               playerController!.setVolume(volume);
+              setState(() {});
             } else if (volume > 0.0) {
+              FlutterVolumeController.setIOSAudioSessionCategory(
+                category: AudioSessionCategory.playback,
+              );
               playerController!.setVolume(volume);
+              setState(() {});
             }
           },
           emitOnStart: false,
