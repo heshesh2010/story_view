@@ -83,15 +83,11 @@ class StoryVideoState extends State<StoryVideo> {
         this.playerController =
             VideoPlayerController.file(widget.videoLoader.videoFile!);
 
-        playerController!.initialize().then((v) {
-          setState(() {});
-          widget.storyController!.play();
+        if (widget.videoLoader.isVideoMuted)
+          playerController!.setVolume(0);
+        else
+          playerController!.setVolume(1);
 
-          if (widget.videoLoader.isVideoMuted)
-            playerController!.setVolume(0);
-          else
-            playerController!.setVolume(1);
-        });
         FlutterVolumeController.addListener(
           (volume) async {
             debugPrint('Hesham Volume changed: $volume');
@@ -104,6 +100,12 @@ class StoryVideoState extends State<StoryVideo> {
           },
           emitOnStart: false,
         );
+
+        playerController!.initialize().then((v) {
+          setState(() {});
+          widget.storyController!.play();
+        });
+
         if (widget.storyController != null) {
           _streamSubscription =
               widget.storyController!.playbackNotifier.listen((playbackState) {
