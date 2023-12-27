@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:real_volume/real_volume.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
@@ -83,38 +84,44 @@ class StoryVideoState extends State<StoryVideo> {
         this.playerController =
             VideoPlayerController.file(widget.videoLoader.videoFile!);
 
+        RealVolume.onRingerModeChanged.listen((RingerMode event) async {
+          if (event == RingerMode.SILENT || event == RingerMode.VIBRATE) {
+            print("StoryHesham video  Muted");
+            playerController!.setVolume(0);
+          } else {
+            print("StoryHesham video not Muted");
+            playerController!.setVolume(1);
+          }
+        });
+
         if (widget.videoLoader.isVideoMuted) {
           playerController!.setVolume(0);
 
           FlutterVolumeController.setIOSAudioSessionCategory(
             category: AudioSessionCategory.ambient,
           );
-          setState(() {});
         } else {
           playerController!.setVolume(1);
 
           FlutterVolumeController.setIOSAudioSessionCategory(
             category: AudioSessionCategory.playback,
           );
-          setState(() {});
         }
 
         FlutterVolumeController.addListener(
           (volume) async {
-            debugPrint('Hesham Volume changed: $volume');
+            debugPrint('StoryHesham Volume changed: $volume');
 
             if (volume == 0.0) {
               FlutterVolumeController.setIOSAudioSessionCategory(
                 category: AudioSessionCategory.ambient,
               );
               playerController!.setVolume(volume);
-              setState(() {});
             } else if (volume > 0.0) {
               FlutterVolumeController.setIOSAudioSessionCategory(
                 category: AudioSessionCategory.playback,
               );
               playerController!.setVolume(volume);
-              setState(() {});
             }
           },
           emitOnStart: false,
