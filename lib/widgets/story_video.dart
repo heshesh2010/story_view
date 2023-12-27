@@ -87,9 +87,15 @@ class StoryVideoState extends State<StoryVideo> {
         RealVolume.onRingerModeChanged.listen((RingerMode event) async {
           if (event == RingerMode.SILENT || event == RingerMode.VIBRATE) {
             print("StoryHesham video  Muted");
+            FlutterVolumeController.setIOSAudioSessionCategory(
+              category: AudioSessionCategory.ambient,
+            );
             playerController!.setVolume(0);
           } else {
             print("StoryHesham video not Muted");
+            FlutterVolumeController.setIOSAudioSessionCategory(
+              category: AudioSessionCategory.playback,
+            );
             playerController!.setVolume(1);
           }
         });
