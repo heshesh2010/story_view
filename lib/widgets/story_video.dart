@@ -145,6 +145,11 @@ class StoryVideoState extends State<StoryVideo> {
               playerController!.pause();
             } else {
               playerController!.play();
+              if (!widget.videoLoader.isVideoMuted) {
+                FlutterVolumeController.setIOSAudioSessionCategory(
+                  category: AudioSessionCategory.playback,
+                );
+              }
             }
           });
         }
